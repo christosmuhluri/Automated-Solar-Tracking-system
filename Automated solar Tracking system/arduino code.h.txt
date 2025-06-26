@@ -1,0 +1,40 @@
+#include <Servo.h>
+
+Servo servoHorizontal;
+
+int ldrLeft = A0;   // Left-side LDR
+int ldrRight = A1;  // Right-side LDR
+
+int posH = 90; // Initial position at center
+
+void setup() {
+  servoHorizontal.attach(9);
+  servoHorizontal.write(posH);
+  delay(1000);
+  Serial.begin(9600); // Optional: monitor LDR values
+}
+
+void loop() {
+  int leftValue = analogRead(ldrLeft);
+  int rightValue = analogRead(ldrRight);
+
+  int difference = leftValue - rightValue;
+
+  int threshold = 50; // Deadzone to avoid jitter
+
+  if (abs(difference) > threshold) {
+    int step = difference / 20; // Smooth, proportional movement
+    posH = constrain(posH + step, 0, 180);
+    servoHorizontal.write(posH);
+  }
+
+  // Optional: print LDR values
+  Serial.print("Left: ");
+  Serial.print(leftValue);
+  Serial.print(" | Right: ");
+  Serial.print(rightValue);
+  Serial.print(" | Servo Pos: ");
+  Serial.println(posH);
+
+  delay(50); // Faster response
+}
